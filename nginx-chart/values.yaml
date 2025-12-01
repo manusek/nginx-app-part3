@@ -2,6 +2,9 @@ namespace: nginx-app
 
 replicaCount: 1
 
+linkerd:
+  inject: enabled
+
 image:
   repository: nginx
   pullPolicy: IfNotPresent
