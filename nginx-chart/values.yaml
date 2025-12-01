@@ -1,0 +1,115 @@
+namespace: nginx-app
+
+replicaCount: 1
+
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  tag: 1.29.3
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+
+podLabels:
+  app: nginx
+
+
+service:
+  type: LoadBalancer
+
+  ports:
+    http: 80
+    https: 443
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+nginx:
+  livenessProbe:
+    httpGet:
+      path: /healthz
+      port: 80
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    failureThreshold: 3
+  readinessProbe:
+    httpGet:
+      path: /healthz
+      port: 80
+    initialDelaySeconds: 5
+    periodSeconds: 5
+
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 50
+  targetMemoryUtilizationPercentage: 80
+
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# PVC
+persistence:
+  enabled: true
+  size: 1Gi
+  accessModes: ReadWriteOnce
+  mountPath: /usr/share/nginx/html
+
+# Storagee Class  
+storageClass:
+  provisioner: k8s.io/minikube-hostpath
+  volumeBindingMode: Immediate
+  reclaimPolicy: Delete
+
+secrets:
+  htpasswd: admin:$apr1$C6YZ5xNC$2OngCqpIqz9WATCf7MENm/
+  mountPath: /etc/nginx/htpasswd
+  subPath: htpasswd
+
+configmap:
+  mountPath: /etc/nginx/nginx.conf
+  subPath: nginx.conf
+  config: |
+    events {}
+
+      http {
+        server {
+          listen 80;
+
+          # Basic auth na głównym endpoint / 
+          auth_basic "Restricted Area";
+          auth_basic_user_file /etc/nginx/htpasswd;
+
+          # Główna strona
+          location / {
+            root /usr/share/nginx/html;
+            index index.html;
+          }
+
+          # Endpoint health check bez auth
+          location /healthz {
+            satisfy any;    # pozwala na dostęp mimo basic auth
+            allow all;
+            return 200;
+          }
+        }
+      }
