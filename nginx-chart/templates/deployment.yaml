@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Values.namespace }}
   labels:
     {{- include "nginx-chart.labels" . | nindent 4 }}
-    {{- if .Values.linkerd.inject }}
+    {{- if .Values.linkerd.enabled }}
     linkerd.io/inject: "enabled"
     {{- end }}
 spec:

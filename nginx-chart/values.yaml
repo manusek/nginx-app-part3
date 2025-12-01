@@ -3,7 +3,7 @@ namespace: nginx-app
 replicaCount: 1
 
 linkerd:
-  inject: enabled
+  enabled: true
 
 image:
   repository: nginx
