@@ -5,9 +5,6 @@ metadata:
   namespace: {{ .Values.namespace }}
   labels:
     {{- include "nginx-chart.labels" . | nindent 4 }}
-    {{- if .Values.linkerd.enabled }}
-    linkerd.io/inject: "enabled"
-    {{- end }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}

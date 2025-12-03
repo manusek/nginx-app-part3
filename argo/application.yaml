@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ include "nginx-chart.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "nginx-chart.labels" . | nindent 4 }}
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/manusek/nginx-app-part3.git 
+    targetRevision: main
+    path: nginx-chart
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ .Values.namespace }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true  
