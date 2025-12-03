@@ -5,6 +5,12 @@ replicaCount: 1
 linkerd:
   enabled: true
 
+podAnnotations:
+  config.linkerd.io/proxy-cpu-request: "20m"
+  config.linkerd.io/proxy-cpu-limit: "100m"
+  config.linkerd.io/proxy-memory-request: "64Mi"
+  config.linkerd.io/proxy-memory-limit: "128Mi"
+
 image:
   repository: nginx
   pullPolicy: IfNotPresent
